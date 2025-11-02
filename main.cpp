@@ -88,18 +88,59 @@ int createLeafNodes(int freq[]) {
 }
 
 // Step 3: Build the encoding tree using heap operations
-int buildEncodingTree(int nextFree) {
-    // TODO:
-    // 1. Create a MinHeap object.
-    // 2. Push all leaf node indices into the heap.
-    // 3. While the heap size is greater than 1:
-    //    - Pop two smallest nodes
-    //    - Create a new parent node with combined weight
-    //    - Set left/right pointers
-    //    - Push new parent index back into the heap
-    // 4. Return the index of the last remaining node (root)
-    return -1; // placeholder
+int buildEncodingTree(int nextFreeIdx) {
+    MinHeap nodeHeap;   // our working heap for combining nodes
+
+    // Step 1: Toss all initial leaf nodes into the heap
+    // (each index represents a symbol or something)
+    for (int i = 0; i < nextFreeIdx; i++) {
+        nodeHeap.push(i, weightArr);
+    }
+
+    // No symbols? No tree.
+    if (nodeHeap.size == 0) {
+        return -1;
+    }
+
+    // Step 2: Combine nodes until we’re left with a single root
+    while (nodeHeap.size > 1) {
+        // grab the two smallest weights
+        int left = nodeHeap.pop(weightArr);
+        int right = nodeHeap.pop(weightArr);
+
+        // Not trying to overflow the node buffer
+        if (nextFreeIdx >= MAX_NODES) {
+            cerr << "[error] Ran out of node space while building tree!" << endl;
+            break; // Could throw but this will do for now
+        }
+
+        // make a new internal node
+        int parent = nextFreeIdx++;
+        leftArr[parent] = left;
+        rightArr[parent] = right;
+
+        weightArr[parent] = weightArr[left] + weightArr[right]; // internal node’s weight is the sum of its children
+
+        charArr[parent] = '\0';  // internal marker (no character here)
+
+        // stick the new parent back into the heap
+        nodeHeap.push(parent, weightArr);
+
+
+    }
+
+    // Step 3: The last remaining item in the heap is our root
+    int rootNode = nodeHeap.pop(weightArr);
+
+
+    if (nodeHeap.size != 0) { // check (heap should now be empty)
+        cerr << "[warn] Heap not empty after building? Something’s fishy.\n";
+    }
+
+    return rootNode;
 }
+
+
 
 // Step 4: Use an STL stack to generate codes
 void generateCodes(int root, string codes[]) {
