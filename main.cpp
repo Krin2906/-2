@@ -91,7 +91,7 @@ int createLeafNodes(int freq[]) {
 int buildEncodingTree(int nextFreeIdx) {
     MinHeap nodeHeap;   // our working heap for combining nodes
 
-    // Step 1: Toss all initial leaf nodes into the heap
+    //  Toss all initial leaf nodes into the heap
     // (each index represents a symbol or something)
     for (int i = 0; i < nextFreeIdx; i++) {
         nodeHeap.push(i, weightArr);
@@ -102,7 +102,7 @@ int buildEncodingTree(int nextFreeIdx) {
         return -1;
     }
 
-    // Step 2: Combine nodes until we’re left with a single root
+    // Combine nodes until we’re left with a single root
     while (nodeHeap.size > 1) {
         // grab the two smallest weights
         int left = nodeHeap.pop(weightArr);
@@ -121,7 +121,7 @@ int buildEncodingTree(int nextFreeIdx) {
 
         weightArr[parent] = weightArr[left] + weightArr[right]; // internal node’s weight is the sum of its children
 
-        charArr[parent] = '\0';  // internal marker (no character here)
+        charArr[parent] = '\0';  // internal marker no character here
 
         // stick the new parent back into the heap
         nodeHeap.push(parent, weightArr);
@@ -181,23 +181,51 @@ void generateCodes(int rootNode, string codes[]) {
 
 
 // Step 5: Print table and encoded message
-void encodeMessage(const string& filename, string codes[]) {
-    cout << "\nCharacter : Code\n";
-    for (int i = 0; i < 26; ++i) {
-        if (!codes[i].empty())
-            cout << char('a' + i) << " : " << codes[i] << "\n";
+void encodeMessage(const string& fileName, string codes[]) {
+    // print the code table
+    cout << "Character : Code" << endl;
+    for (int i = 0; i < 26; i++) {
+        if (codes[i] != "") {
+            char letter = 'a' + i;
+            cout << letter << " : " << codes[i] << endl;
+        }
     }
 
     cout << "\nEncoded message:\n";
 
-    ifstream file(filename);
-    char ch;
-    while (file.get(ch)) {
-        if (ch >= 'A' && ch <= 'Z')
-            ch = ch - 'A' + 'a';
-        if (ch >= 'a' && ch <= 'z')
-            cout << codes[ch - 'a'];
+    // open the file and start encoding
+    ifstream inFile(fileName);
+    if (!inFile.is_open()) {
+        cerr << "[error] Could not open input file: " << fileName << endl;
+        cout << "" << endl;
+        return;
     }
-    cout << "\n";
-    file.close();
+
+    string encoded = "";
+    char ch;
+
+    while (inFile.get(ch)) {
+        // lowercase conversio
+        if (ch >= 'A' && ch <= 'Z') {
+            ch = ch - 'A' + 'a';
+        }
+
+        // only encode lowercase alphabet chars
+        if (ch >= 'a' && ch <= 'z') {
+            int idx = ch - 'a';
+            string codeForChar = codes[idx];
+
+            if (codeForChar.size() > 0) {
+                encoded += codeForChar;
+            } else {
+
+            }
+        }
+        //Everything else (spaces, punctuation) just ignored
+    }
+
+    // Finally, print encoded string
+    cout << encoded << endl;
+
+    inFile.close();
 }
