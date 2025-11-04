@@ -1,6 +1,12 @@
 // Written by Manju Muralidharan on 10/19/25
 // A quick & clean MinHeap implementation for managing indices with weights
 
+// MinHeap for Huffman Encoding
+// Stores node INDICES. Ordering is based on weightArr[index].
+// parent: (i - 1) / 2
+// Children: 2i + 1, 2i + 2
+// Ties are broken by smaller index values to ensure consistent ordering.
+
 #ifndef HEAP_H
 #define HEAP_H
 

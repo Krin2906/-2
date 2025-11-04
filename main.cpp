@@ -1,6 +1,13 @@
 //
 // Created by Manju Muralidharan on 10/19/25.
-//
+
+// Huffman-like Variable-Bit Encoder
+// Pipeline overview:
+// 1) Read input.txt and count the frequency of lowercase letters.
+// 2) Create leaf nodes in parallel arrays (charArr, weightArr, leftArr, rightArr)
+// 3) Use the MinHeap to create the encoding tree. Combine the two smallest nodes until there is only one root.
+// 4) Iterative traversal using std::stack: assign codes using left = 0, right = 1.
+// 5) Print the code table and the encoded message.
 #include <iostream>
 #include <fstream>
 #include <stack>
@@ -31,8 +38,19 @@ int main() {
     // Step 2: Create leaf nodes for each character with nonzero frequency
     int nextFree = createLeafNodes(freq);
 
+    // Safety check: if we didn't find any letters in the file, we can't do anything
+    if (nextFree == 0) {
+        // Still need to print the expected format even with no data
+        cout << "Character : Code\n\nEncoded message:\n\n";
+        return 0;  // exit early since there's nothing to encode
+    }
+
     // Step 3: Build encoding tree using your heap
     int root = buildEncodingTree(nextFree);
+    if (root == -1) {
+        cout << "Character : Code\n\nEncoded message:\n\n";
+        return 0;
+    }
 
     // Step 4: Generate binary codes using an STL stack
     string codes[26];
@@ -129,7 +147,7 @@ int buildEncodingTree(int nextFreeIdx) {
 
     }
 
-    // Step 3: The last remaining item in the heap is our root
+    //  The last remaining item in the heap is our root
     int rootNode = nodeHeap.pop(weightArr);
 
 
